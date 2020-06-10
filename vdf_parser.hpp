@@ -367,6 +367,14 @@ namespace tyti
                     }
                 };
 
+                auto try_skip_attribute = [&](IterT& iter, const IterT& last)
+                {
+                    iter = skip_whitespaces(iter, last);
+                    if (*iter == '[' && *(iter + 1) == '$')
+                    {
+                        while (*(iter++) != ']');
+                    }
+                };
 
                 //read header
                 // first, quoted name
@@ -406,6 +414,9 @@ namespace tyti
                             if (curIter == last || *curIter == '}')
                                 throw std::runtime_error{ "key declared, but no value" };
                         }
+
+                        try_skip_attribute(curIter, last);
+
                         // get value
                         if (*curIter != '{')
                         {
@@ -416,6 +427,8 @@ namespace tyti
                             auto value = std::basic_string<charT>(curIter, valueEnd);
                             strip_escape_symbols(value);
                             curIter = valueEnd + ((*valueEnd == TYTI_L(charT, '\"')) ? 1 : 0);
+
+                            try_skip_attribute(curIter, last);
 
                             // process value
                             if (key != TYTI_L(charT, "#include") && key != TYTI_L(charT, "#base"))
