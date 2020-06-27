@@ -188,6 +188,29 @@ namespace tyti
             {
                 name = std::move(n);
             }
+            basic_object<char_type>& get_or_add_child(const std::string& name)
+            {
+                auto found = childs.find(name);
+                if (found != childs.end())
+                {
+                    return *found->second;
+                }
+                else
+                {
+                    auto newObj = std::make_shared<basic_object<char_type>>();
+                    newObj->name = name;
+                    childs.emplace(name, newObj);
+                    return *newObj;
+                }
+            }
+            std::basic_string<char_type>& get_or_add_attrib(const std::string& name)
+            {
+                auto found = attribs.find(name);
+                if (found != attribs.end())
+                    return found->second;
+                else
+                    return attribs.emplace(name, std::string{}).first->second;
+            }
         };
 
         template<typename CharT>
